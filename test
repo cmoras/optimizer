@@ -1,0 +1,63 @@
+#!/bin/bash 
+
+#to check for virtulization
+cond1=`/bin/lsmod | egrep -i "xen|virtio"`;
+#to check for if the drive is raid related or locally attached
+
+
+
+
+function prep_sched
+{
+if [[ $ssd == "1" && $local == "0" ]]; then
+	sched=noop;
+fi
+
+if [[ $ssd == "0" && $local == "1" ]]; then 
+	sched=deadline
+fi
+}
+
+function set_sched
+
+
+
+functon main
+{
+cond2=`lspci | grep -i raid`;
+if [[ -z $cond2 ]]; then
+	#start checking for SSD or not
+	cd /sys/block;
+	for sd in `ls | grep sd| cut -d@ -f1`;
+		check_type $sd;
+		set_schedule $ssd $local;
+}
+
+if [[ $ssd == "1" && $local == "0" ]]; then 
+			sched=noop;
+		
+			
+}
+
+#starting with optimizing no virtualized componenets.
+
+function check_type 
+{
+unset ssd;
+unset local;
+if  [[ `cat /sys/block/$sd/queue/rotational` == 0 ]];then
+	ssd=1;local=0;
+else
+	local=1;ssd=0
+fi
+}
+
+
+if [[ -z  $cond1 ]];then 
+	echo "[!!]No loaded drivers found pertaining to virtualization, in the kernel."
+	main;
+	
+	
+
+		
+		
